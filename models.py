@@ -2,7 +2,7 @@ from flask_login import UserMixin
 from db import get_db_connection
 
 class User(UserMixin):
-    def __init__(self, id, email, password):
+    def __init__(self, id,email, password):
         self.id = id
         self.email = email
         self.password = password
@@ -16,15 +16,19 @@ class User(UserMixin):
         usuario = cursor.fetchone()
         cursor.close()
         conn.close()
-        return usuario
+        if usuario:
+            return User(usuario["idusuario"], usuario["email"], usuario["password"])
+        return None
 
     @staticmethod
     def get_by_id(user_id):
         # consulta por id
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("select * from usuarios where id=%s", (user_id,))
+        cursor.execute("select * from usuarios where idusuario=%s", (user_id,))
         usuario = cursor.fetchone()
         cursor.close()
         conn.close()
-        return usuario
+        if usuario:
+            return User(usuario["idusuario"], usuario["email"], usuario["password"] )
+        return None
