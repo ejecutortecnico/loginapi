@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro Flask + Fetch</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background: #f8fafc; }
+    h2 { color: #1e293b; }
+    form { background: white; padding: 20px; border-radius: 10px; width: 300px; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #cbd5e1; border-radius: 6px; }
+    button { margin-top: 15px; padding: 10px 15px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #1e40af; }
+    #message { margin-top: 20px; font-weight: bold; }
+    pre { background: #f1f5f9; padding: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+
+  <h2>Registro de usuario</h2>
+  <form id="registerForm">
+    <label>Usuario:</label>
+    <input type="text" id="email" required>
+
+    <label>Contraseña:</label>
+    <input type="password" id="password" required>
+
+    <button type="submit">Registrarme</button>
+  </form>
+
+  <div id="message"></div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:5000";
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch(`${API_URL}/auth/registrarse`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // opcional si luego harás login automático
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        document.getElementById("message").innerHTML = `
+          <p style="color:green;">✅ ${data.message}</p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } else {
+        document.getElementById("message").innerHTML = `
+          <p style="color:red;">❌ Error: ${data.error || 'No se pudo registrar'}</p>
+        `;
+      }
+    });
+  </script>
+
+</body>
+</html>
