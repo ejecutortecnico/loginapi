@@ -3,33 +3,33 @@ from flask_login import login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import get_db_connection
 
-usuarios_bp = Blueprint("usuarios", __name__)
+productos_bp = Blueprint("productos", __name__)
 
-@usuarios_bp.route("/usuarios", methods=["GET"])
+@productos_bp.route("/productos", methods=["GET"])
 #@login_required
-def get_usuarios():
+def get_productos():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("select * from usuarios")
-    usuarios = cursor.fetchall()
+    cursor.execute("select * from productos")
+    productos = cursor.fetchall()
     cursor.close()
     conn.close()
-    return jsonify(usuarios)
+    return jsonify(productos)
 
-@usuarios_bp.route("/usuario/<int:id>", methods=["GET"])
+@productos_bp.route("/producto/<int:id>", methods=["GET"])
 #@login_required
-def get_usuario(id):
+def get_producto(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("select * from usuarios where idusuario=%s", (id,))
-    usuario = cursor.fetchone()
+    cursor.execute("select * from productos where idproducto=%s", (id,))
+    producto = cursor.fetchone()
     cursor.close()
     conn.close()
-    return jsonify(usuario)
+    return jsonify(producto)
 
-@usuarios_bp.route("/usuarios", methods=["POST"])
+@productos_bp.route("/productos", methods=["POST"])
 #@login_required
-def add_usuario():
+def add_producto():
     data = request.json
     nombre = data.get("nombre")
     apellido = data.get("apellido")
@@ -39,7 +39,7 @@ def add_usuario():
     hashed_pw = generate_password_hash(password)
     conn = get_db_connection()
     cursor = conn.cursor()
-    sql = """INSERT INTO usuarios 
+    sql = """INSERT INTO productos 
              (nombre,apellido, email, telefono,password) 
              VALUES (%s, %s, %s, %s, %s)"""
     values = (nombre,apellido, email, telefono, hashed_pw)
@@ -48,33 +48,33 @@ def add_usuario():
     last_id = cursor.lastrowid
     cursor.close()
     conn.close()
-    return jsonify({"message":"usuario agregado"})
+    return jsonify({"message":"producto agregado"})
 
-@usuarios_bp.route("/usuarios/<int:id>", methods=["PUT"])
+@productos_bp.route("/productos/<int:id>", methods=["PUT"])
 #@login_required
-def update_usuario(id):
+def update_producto(id):
     data = request.json
     email = data.get("email")
     telefono = data.get("telefono")
     conn = get_db_connection()
     cursor = conn.cursor()
     values = (email,telefono, id)
-    cursor.execute("update usuarios set email=%s, telefono=%s where idusuario=%s", values)
+    cursor.execute("update productos set email=%s, telefono=%s where idproducto=%s", values)
     conn.commit()
     cursor.close()
     conn.close
-    return jsonify({"message":"usuario actualizado"})
+    return jsonify({"message":"producto actualizado"})
 
-@usuarios_bp.route("/usuarios/<int:id>", methods=["DELETE"])
+@productos_bp.route("/productos/<int:id>", methods=["DELETE"])
 #@login_required
-def delete_usuario(id):
+def delete_producto(id):
     conn = get_db_connection()
     cursor = conn.cursor()
     values = (id,)
-    cursor.execute("delete from usuarios where idusuario=%s", values)
+    cursor.execute("delete from prodcutos where id=%s", values)
     conn.commit()
     cursor.close()
     conn.close
-    return jsonify({"message":"usuario eliminado"})
+    return jsonify({"message":"producto eliminado"})
 
 
